@@ -1,50 +1,71 @@
-import org.json.JSONArray;
-import org.json.JSONException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.net.URL;
-import java.nio.charset.Charset;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import java.util.Scanner;
 
 public class RESTapiExample {
 
-    private static String readAll(Reader rd) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        int cp;
-        while ((cp = rd.read()) != -1) {
-            sb.append((char) cp);
+    public static void main(String[] args) throws URISyntaxException, IOException {
+
+        URI uri = new URIBuilder()
+                .setScheme("https")
+                .setHost("reqres.in")
+                .setPath("/api/users?page=2")
+                .build();
+        HttpGet httpget = new HttpGet(uri);
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        CloseableHttpResponse response = httpclient.execute(httpget);
+        String content = EntityUtils.toString(response.getEntity());
+        //content = content.substring(1, content.length() - 1); //opcjonalnie gdy content jest otoczony []
+
+
+
+
+        //show language and area of Poland
+
+//        String area = json.get("area").toString();
+//        System.out.println("Polska ma " + area + " km2 powierzchni!");
+//        JSONArray languagesArray = (JSONArray) json.get("languages");
+//        JSONObject languages = (JSONObject) languagesArray.get(0);
+//
+//        String glownyJezyk = languages.get("nativeName").toString();
+//        System.out.println("Głównym jezykiem jest " + glownyJezyk +"!");
+
+        System.out.println("Co chcesz zrobić?");
+        System.out.println("1. Pokaz uzytkowników");
+        System.out.println("2. Utwórz użytkownika");
+        System.out.println("3. Zakończ program");
+
+        char letter;
+        Scanner kb = new Scanner(System.in);
+        letter = kb.next().charAt(0);
+
+        switch(Character.toUpperCase(letter))
+        {
+            case '1':
+                JSONObject json = new JSONObject(content);
+                System.out.println(json);
+                break;
+            case '2':
+                JSONObject newUser = new JSONObject(content);
+                System.out.println(newUser);
+                break;
+            case '3':
+                System.exit(0);
+                break;
+
         }
-        return sb.toString();
-    }
-
-    public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-        InputStream is = new URL(url).openStream();
-        try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            String jsonText = readAll(rd);
-            jsonText = jsonText.substring(1, jsonText.length() - 1);
-            JSONObject json = new JSONObject(jsonText);
-            return json;
-        } finally {
-            is.close();
-        }
-    }
 
 
 
-
-    public static void main(String[] args) throws IOException {
-
-
-        //
-        JSONObject json = readJsonFromUrl("https://restcountries.eu/rest/v2/name/Poland");
-
-        String area = json.get("area").toString();
-        System.out.println("Polska ma " + area + " km2 powierzchni!");
-        JSONArray languagesArray = (JSONArray) json.get("languages");
-        JSONObject languages = (JSONObject) languagesArray.get(0);
-
-        String glownyJezyk = languages.get("nativeName").toString();
-        System.out.println("Głównym jezykiem jest " + glownyJezyk +"!");
     }
 }
